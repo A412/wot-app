@@ -49,6 +49,46 @@ class Battle:
     def __repr__(self):
         return '{0} - {1} - {2}'.format(self.name,self.map,self.local_time)
 
+class Tournament:
+    def __init__(self, province_json):
+        self.matches = []
+        if province_json['count'] > 0:
+            for match in province_json['data'][0]['tournament_tree']:
+                self.matches.append({'clan1':match['battles'][0]['clan1'],'clan2':match['battles'][0]['clan2']})
+        self.process()
+
+    def process(self):
+        newmatches = []
+        for match in self.matches:
+            newdic = {}
+            newmatches.append(newdic)
+            for clan in match:
+                if type(match[clan]) != Clan:
+                    newdic.update({clan:id_to_clan(match[clan])})
+        self.matches = newmatches
+
+    def enemies(self,id):
+        matches = []
+        for match in self.matches:
+            if match['clan1']['id'] == id:
+                matches.append(match['clan2'])
+            elif match['clan2']['id'] == id:
+                matches.append(match['clan1'])
+        return matches
+
+    def __repr__(self):
+        mystr = ''
+        for match in self.matches:
+            mystr += (str(match['clan1']) + ' -- ' + str(match['clan2']) + '\n')
+        return mystr
+
+def id_to_clan(clan_id):
+    return Clan(requests.get('https://api.worldoftanks.com/wot/clan/info/?application_id=f5904c98f5c04af24820d01cbddd8a86&clan_id={0}'.format(clan_id)).json()['data'][str(clan_id)])
+
+def search_province(province_id):
+    province_json = requests.get('https://api.worldoftanks.com/wot/globalwar/tournaments/?application_id=f5904c98f5c04af24820d01cbddd8a86&map_id=globalmap&province_id={0}'.format(province_id)).json()
+    return Tournament(province_json)
+
 def pick_clan(search_name):
     clan_list = requests.get('https://api.worldoftanks.com/wot/clan/list/?application_id=f5904c98f5c04af24820d01cbddd8a86&search={0}'.format(search_name)).json()['data']
     clans = []
@@ -68,12 +108,7 @@ def pick_clan(search_name):
     return clan
 
 clan = pick_clan(input('Clan: '))
-
+print(clan)
+enemies = []
 for battle in clan.battles:
-    print(battle)
-
-#print(a.json())
-#b = a.json()
-#print(b['data'])
-#r = requests.get('https://api.worldoftanks.com/wot/globalwar/battles/?application_id=f5904c98f5c04af24820d01cbddd8a86&map_id=globalmap&clan_id=1000009169')
-#print(r.json())
+    enemies.append(search_province(battle.province_id).enemies(clan.id))
