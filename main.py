@@ -1,5 +1,6 @@
 import requests
 import time
+import nm
 
 class Clan:
     def __init__(self, clan_json = None):
@@ -85,7 +86,7 @@ class Tournament:
 def id_to_clan(clan_id):
     return Clan(requests.get('https://api.worldoftanks.com/wot/clan/info/?application_id=f5904c98f5c04af24820d01cbddd8a86&clan_id={0}'.format(clan_id)).json()['data'][str(clan_id)])
 
-def search_province(province_id):
+def get_tournament(province_id):
     province_json = requests.get('https://api.worldoftanks.com/wot/globalwar/tournaments/?application_id=f5904c98f5c04af24820d01cbddd8a86&map_id=globalmap&province_id={0}'.format(province_id)).json()
     return Tournament(province_json)
 
@@ -108,7 +109,8 @@ def pick_clan(search_name):
     return clan
 
 clan = pick_clan(input('Clan: '))
-print(clan)
-enemies = []
-for battle in clan.battles:
-    enemies.append(search_province(battle.province_id).enemies(clan.id))
+nm.pull_data(clan).report()
+#print(clan)
+#enemies = []
+#for battle in clan.battles:
+#    enemies.append(search_province(battle.province_id).enemies(clan.id))
