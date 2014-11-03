@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 import main
+import nm
 
 app = Flask(__name__)
 
@@ -10,7 +11,7 @@ def hello():
 
 @app.route("/clan/<clan_name>")
 def go():
-    clan = pick_clan(clan_name)
+    clan = main.pick_clan(clan_name)
     return str(nm.pull_data(clan)))
 
 if __name__ == "__main__":
