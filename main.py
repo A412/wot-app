@@ -107,7 +107,7 @@ def get_tournament(province_id):
     province_json = requests.get('https://api.worldoftanks.com/wot/globalwar/tournaments/?application_id=f5904c98f5c04af24820d01cbddd8a86&map_id=globalmap&province_id={0}'.format(province_id)).json()
     return Tournament(province_json)
 
-def pick_clan(search_name):
+def pick_clan(search_name, opt_num = None):
     clan_list = requests.get('https://api.worldoftanks.com/wot/clan/list/?application_id=f5904c98f5c04af24820d01cbddd8a86&search={0}'.format(search_name)).json()['data']
     clans = []
     for i in range(len(clan_list)):
@@ -117,15 +117,18 @@ def pick_clan(search_name):
     for i in range(len(clans)):
         print('{0} | {1}'.format(i,clans[i]))
     clan = None
-    while clan == None:
-        clan_num = input('Select clan from search list by number: #')
-        try:
-            clan_num = int(clan_num)
-            clan = clans[clan_num]
-        except ValueError:
-            print('Not a number.')
-        except IndexError:
-            print('Out of range.')
+    if opt_num == None:
+        while clan == None:
+            clan_num = input('Select clan from search list by number: #')
+            try:
+                clan_num = int(clan_num)
+                clan = clans[clan_num]
+            except ValueError:
+                print('Not a number.')
+            except IndexError:
+                print('Out of range.')
+    else:
+        clan = clans[int(clan_num)]
     return clan
 
 def check_clan():

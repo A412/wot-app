@@ -9,10 +9,15 @@ app = Flask(__name__)
 def hello():
     return "Hello world!"
 
-@app.route("/clan/<clan_name>")
-def go():
+@app.route("/<clan_name>")
+def go(clan_name):
     clan = main.pick_clan(clan_name)
-    return str(nm.pull_data(clan)))
+    return str(nm.pull_data(clan))
+
+@app.route("/<clan_name>/<opt_num>")
+def go2(clan_name,opt_num):
+    clan = main.pick_clan(clan_name,opt_num)
+    return str(nm.pull_data(clan))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
