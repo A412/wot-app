@@ -3,6 +3,9 @@ import time
 import nm
 
 class Clan:
+
+    error_clan = ('Not a valid clan')
+
     def __init__(self, clan_json = None):
         if clan_json:
             self.name = clan_json['name']
@@ -114,6 +117,7 @@ def pick_clan(search_name, opt_num = None):
         clans.append(Clan(clan_list[i]))
         if clans[i].abbreviation == search_name:
             return clans[i]
+    return Clan.error_clan
     for i in range(len(clans)):
         print('{0} | {1}'.format(i,clans[i]))
     clan = None
