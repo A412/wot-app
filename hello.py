@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "Hello world!"
+    return "welcome to wotapp: usage - https://wotapp.herokuapp.com/<CLAN_NAME> - for example: https://wotapp.herokuapp.com/-G-"
 
 @app.route("/<clan_name>")
 def go(clan_name):
