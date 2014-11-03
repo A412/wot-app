@@ -10,8 +10,8 @@ class ClanData():
         self.wr_60 = wr_60
         self.battle_count = battle_count
 
-    def report(self):
-        print('Tier 10 tanks: {0}\nAverage WN8: {1}\nAverage 60-day WN8: {2}\nAverage WR: {3}\nAverage 60-day WR: {4}\nAverage Battle Count: {5}'.format(self.t10_tanks,self.avg_wn8,self.avg_wn8_60,self.wr,self.wr_60,self.battle_count))
+    def __repr__(self):
+        return 'Tier 10 tanks: {0}\nAverage WN8: {1}\nAverage 60-day WN8: {2}\nAverage WR: {3}\nAverage 60-day WR: {4}\nAverage Battle Count: {5}'.format(self.t10_tanks,self.avg_wn8,self.avg_wn8_60,self.wr,self.wr_60,self.battle_count)
 
 def pull_data(clan):
     nm_page = requests.get('http://www.noobmeter.com/clanTankList/na/{0}/{1}'.format(clan.abbreviation,clan.id)).text
@@ -32,7 +32,7 @@ def pull_data(clan):
 def search_forward(search_str, first, last):
     new_str = search_str[first:last]
     i = 0
-    while is_int(new_str[i]):
+    while i < len(new_str) and is_int(new_str[i]):
         i += 1
     return new_str[:i]
 
