@@ -4,7 +4,7 @@ import nm
 
 class Clan:
 
-    error_clan = ('Not a valid clan')
+    error_clan = 'Not a valid clan'
 
     def __init__(self, clan_json = None):
         if clan_json:
@@ -138,6 +138,8 @@ def pick_clan(search_name, opt_num = None):
 def check_clan():
     clan = pick_clan(input('Clan: '))
     print(nm.pull_data(clan))
+    for battle in clan.battles:
+        print(analyze_matches(clan,get_tournament(battle.province_id)))
 
 def check_province():
     province_tourn = get_tournament(input('Province ID: '))

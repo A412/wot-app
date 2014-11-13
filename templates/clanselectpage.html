@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <title>{{ search_name }}</title>
+    </head>
+    <body>
+        <h1>{{ search_name }}</h1>
+        <form action="/choose" method="POST">
+            {% for clan in clans %}
+                <input type="radio" value={{ clan }}>{{ str(clan) }}</input>
+            {% endfor %}
+            <input type="submit" value="Submit"/>
+        </form>
+    </body>
+</html>
