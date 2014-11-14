@@ -4,7 +4,7 @@
     </head>
     <body>
         <h1>{{ clan_name }}</h1>
-        {{ clan_text }}
+        {{ clan_text | nl2br }}
         <form action="/home" method="POST">
           <input type="submit" value="Back"/>
         </form>

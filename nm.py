@@ -10,11 +10,14 @@ class ClanData():
         self.wr_60 = wr_60
         self.battle_count = battle_count
 
+    def __str__(self):
+        return 'Tier 10 tanks: {0}\nAverage WN8: {1}\nAverage 60-day WN8: {2}\nAverage WR: {3}\nAverage 60-day WR: {4}\nAverage Battle Count: {5}\n'.format(self.t10_tanks,self.avg_wn8,self.avg_wn8_60,self.wr,self.wr_60,self.battle_count)
+
     def __repr__(self):
-        return 'Tier 10 tanks: {0}\nAverage WN8: {1}\nAverage 60-day WN8: {2}\nAverage WR: {3}\nAverage 60-day WR: {4}\nAverage Battle Count: {5}'.format(self.t10_tanks,self.avg_wn8,self.avg_wn8_60,self.wr,self.wr_60,self.battle_count)
+        return 'Tier 10 tanks: {0}\nAverage WN8: {1}\nAverage 60-day WN8: {2}\nAverage WR: {3}\nAverage 60-day WR: {4}\nAverage Battle Count: {5}\n'.format(self.t10_tanks,self.avg_wn8,self.avg_wn8_60,self.wr,self.wr_60,self.battle_count)
 
 def pull_data(clan):
-    if clan != Clan.error_clan:
+    if clan != clan.error_clan:
         nm_page = requests.get('http://www.noobmeter.com/clanTankList/na/{0}/{1}'.format(clan.abbreviation,clan.id)).text
         first_total = nm_page.find('Total (')
         total = search_forward(nm_page, first_total+7, first_total + 12)

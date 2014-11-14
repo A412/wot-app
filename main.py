@@ -4,7 +4,7 @@ import nm
 
 class Clan:
 
-    error_clan = 'Not a valid clan'
+    error_clan = 'error_clan'
 
     def __init__(self, clan_json = None):
         if clan_json:
@@ -21,7 +21,7 @@ class Clan:
             self.emblem = ''
 
     def __repr__(self):
-        return '{0} ({1}) - {2}'.format(self.name,self.abbreviation,self.id)
+        return '{0} ({1})'.format(self.name,self.abbreviation)
 
     @property
     def battles(self):
@@ -76,48 +76,58 @@ class Tournament:
         newmatches = []
         for match in self.matches:
             newdic = {}
-            newmatches.append(newdic)
             for clan in match:
                 if type(match[clan]) != Clan:
-                    newdic.update({clan:id_to_clan(match[clan])})
+                    newclan = id_to_clan(match[clan])
+                    if newclan is not Clan.error_clan:
+                        newdic.update({clan:id_to_clan(match[clan])})
+            if newdic:
+                newmatches.append(newdic)
         self.matches = newmatches
 
     def enemies(self,id):
         matches = []
         for match in self.matches:
-            if match['clan1']['id'] == id:
-                matches.append(match['clan2'])
-            elif match['clan2']['id'] == id:
-                matches.append(match['clan1'])
+            if 'clan1' in match:
+                if match['clan1'].id == id:
+                    matches.append(match['clan2'])
+            if 'clan2' in match:
+                if match['clan2'].id == id:
+                    matches.append(match['clan1'])
         return matches
 
     def __repr__(self):
         mystr = self.battle.__repr__() + '\n'
         for match in self.matches:
-            mystr += (str(match['clan1']) + ' -- ' + str(match['clan2']) + '\n')
+            mystr += ((str(match['clan1']) if 'clan1' in match else '----') + ' -- ' + (str(match['clan2']) if 'clan2' in match else '----') + '\n')
         return mystr
 
 def analyze_matches(clan,tournament):
     matches = tournament.enemies(clan.id)
+    return_str = '\n' + str(tournament) + '\nEnemies:\n'
     for clan in matches:
-        print(clan.name)
-        pull_data(clan).report()
+        return_str += '\n' + str(clan.name) + '\n' + str(nm.pull_data(clan))
+    return return_str
 
 def id_to_clan(clan_id):
-    return Clan(requests.get('https://api.worldoftanks.com/wot/clan/info/?application_id=f5904c98f5c04af24820d01cbddd8a86&clan_id={0}'.format(clan_id)).json()['data'][str(clan_id)])
+    clan_json = requests.get('https://api.worldoftanks.com/wot/clan/info/?application_id=f5904c98f5c04af24820d01cbddd8a86&clan_id={0}'.format(clan_id)).json()
+    if 'data' in clan_json:
+        return Clan(clan_json['data'][str(clan_id)])
+    return Clan.error_clan
 
 def get_tournament(province_id):
     province_json = requests.get('https://api.worldoftanks.com/wot/globalwar/tournaments/?application_id=f5904c98f5c04af24820d01cbddd8a86&map_id=globalmap&province_id={0}'.format(province_id)).json()
     return Tournament(province_json)
 
-def pick_clan(search_name, opt_num = None):
+def pick_clan(search_name, from_console = False):
     clan_list = requests.get('https://api.worldoftanks.com/wot/clan/list/?application_id=f5904c98f5c04af24820d01cbddd8a86&search={0}'.format(search_name)).json()['data']
     clans = []
     for i in range(len(clan_list)):
         clans.append(Clan(clan_list[i]))
         if clans[i].abbreviation == search_name:
             return clans[i]
-    return Clan.error_clan
+    if not from_console:
+        return Clan.error_clan
     for i in range(len(clans)):
         print('{0} | {1}'.format(i,clans[i]))
     clan = None
@@ -135,11 +145,15 @@ def pick_clan(search_name, opt_num = None):
         clan = clans[int(clan_num)]
     return clan
 
-def check_clan():
-    clan = pick_clan(input('Clan: '))
-    print(nm.pull_data(clan))
+def check_clan(clan_name = None):
+    if clan_name == None:
+        clan = pick_clan(input('Clan: '))
+    else:
+        clan = pick_clan(clan_name)
+    return_str = str(nm.pull_data(clan))+'\n\nCurrent Tournaments: '
     for battle in clan.battles:
-        print(analyze_matches(clan,get_tournament(battle.province_id)))
+        return_str += analyze_matches(clan,get_tournament(battle.province_id))
+    return return_str
 
 def check_province():
     province_tourn = get_tournament(input('Province ID: '))
@@ -152,6 +166,6 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--province', help='Check province data', action='store_true')
     args = parser.parse_args()
     if args.clan:
-        check_clan()
+        print(check_clan())
     elif args.province:
         check_province()
